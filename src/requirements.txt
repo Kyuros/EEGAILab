@@ -1,0 +1,6 @@
+- MATLAB R2019b
+- LIVSVM v3.24 (https://www.csie.ntu.edu.tw/~cjlin/libsvm/)
+- EEGLAB v2019.1 (https://sccn.ucsd.edu/eeglab/download.php)
+- ICLabel v1.2.6 (EEGLAB Plugin)
+- dipfit v1.3.4 (EEGLAB Plugin)
+- SASICA v3.4 (EEGLAB Plugin)

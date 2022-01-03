@@ -1,0 +1,71 @@
+label,hemisphere,lobe,gyrus
+bankssts L,Left,none,Banks of Superior Temporal Sulcus
+caudalanteriorcingulate L,Left,Frontal,Caudal Anterior Cingulate
+caudalmiddlefrontal L,Left,Frontal,Caudal Middle Frontal
+corpuscallosum L,Left,none,Corpus Callosum
+cuneus L,Left,Occipital,Cuneus
+entorhinal L,Left,Temporal,Entorhinal
+fusiform L,Left,Temporal,Fusiform
+inferiorparietal L,Left,Parietal,Inferior Parietal
+inferiortemporal L,Left,Temporal,Inferior Temporal
+isthmuscingulate L,Left,Parietal,Isthmus
+lateraloccipital L,Left,Occipital,Lateral Occipital
+lateralorbitofrontal L,Left,Frontal,Lateral Orbitofrontal
+lingual L,Left,Occipital,Lingual
+medialorbitofrontal L,Left,Frontal,Medial Orbitofrontal
+middletemporal L,Left,Temporal,Middle Temporal
+parahippocampal L,Left,Temporal,Parahippocampal
+paracentral L,Left,Frontal,Paracentral
+parsopercularis L,Left,Frontal,Pars Opercularis
+parsorbitalis L,Left,Frontal,Pars Orbitalis
+parstriangularis L,Left,Frontal,Pars Triangularis
+pericalcarine L,Left,Occipital,Pericalcarine
+postcentral L,Left,Parietal,Postcentral
+posteriorcingulate L,Left,Parietal,Posterior Cingulate
+precentral L,Left,Frontal,Precentral
+precuneus L,Left,Parietal,Precuneus
+rostralanteriorcingulate L,Left,Frontal,Rostral Anterior Cingulate
+rostralmiddlefrontal L,Left,Frontal,Rostral Middle Frontal
+superiorfrontal L,Left,Frontal,Superior Frontal
+superiorparietal L,Left,Parietal,Superior Parietal
+superiortemporal L,Left,Temporal,Superior Temporal
+supramarginal L,Left,Parietal,Supramarginal
+frontalpole L,Left,Frontal,Frontal Pole
+temporalpole L,Left,Temporal,Temporal Pole
+transversetemporal L,Left,Temporal,Transverse Temporal
+bankssts R,Right,none,Banks of Superior Temporal Sulcus
+caudalanteriorcingulate R,Right,Frontal,Caudal Anterior Cingulate
+caudalmiddlefrontal R,Right,Frontal,Caudal Middle Frontal
+corpuscallosum R,Right,none,Corpus Callosum
+cuneus R,Right,Occipital,Cuneus
+entorhinal R,Right,Temporal,Entorhinal
+fusiform R,Right,Temporal,Fusiform
+inferiorparietal R,Right,Parietal,Inferior Parietal
+inferiortemporal R,Right,Temporal,Inferior Temporal
+isthmuscingulate R,Right,Parietal,Isthmus
+lateraloccipital R,Right,Occipital,Lateral Occipital
+lateralorbitofrontal R,Right,Frontal,Lateral Orbitofrontal
+lingual R,Right,Occipital,Lingual
+medialorbitofrontal R,Right,Frontal,Medial Orbitofrontal
+middletemporal R,Right,Temporal,Middle Temporal
+parahippocampal R,Right,Temporal,Parahippocampal
+paracentral R,Right,Frontal,Paracentral
+parsopercularis R,Right,Frontal,Pars Opercularis
+parsorbitalis R,Right,Frontal,Pars Orbitalis
+parstriangularis R,Right,Frontal,Pars Triangularis
+pericalcarine R,Right,Occipital,Pericalcarine
+postcentral R,Right,Parietal,Postcentral
+posteriorcingulate R,Right,Parietal,Posterior Cingulate
+precentral R,Right,Frontal,Precentral
+precuneus R,Right,Parietal,Precuneus
+rostralanteriorcingulate R,Right,Frontal,Rostral Anterior Cingulate
+rostralmiddlefrontal R,Right,Frontal,Rostral Middle Frontal
+superiorfrontal R,Right,Frontal,Superior Frontal
+superiorparietal R,Right,Parietal,Superior Parietal
+superiortemporal R,Right,Temporal,Superior Temporal
+supramarginal R,Right,Parietal,Supramarginal
+frontalpole R,Right,Frontal,Frontal Pole
+temporalpole R,Right,Temporal,Temporal Pole
+transversetemporal R,Right,Temporal,Transverse Temporal
+insula L,Left,none,Insula
+insula R,Right,none,Insula
