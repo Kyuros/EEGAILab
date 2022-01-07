@@ -44,9 +44,10 @@ function [] = eeglab2comp(input_path,ML_path,output_path,subj,weight_type)
 %        folder name as prefix.
 
 %% Initializing variables and checking inputs
-input_data = dir(input_path); % Directory for EEG inputs
-ML_folder = dir(ML_path); % Directory for machine learning inputs
-N = (length(input_data)-2)/2; % Number of unique subjects
+dir_eeg = dir(fullfile(input_path,'*.set'));
+dir_ML = dir(ML_path); % Directory for machine learning inputs
+dir_ML = dir_ML(~ismember({dir_ML.name},{'.','..'})); % Remove . and .. from directory
+N = length(dir_eeg); % Number of unique subjects
 
 % Checks subject numbering and if correct size
 if ~exist('subj','var')
@@ -72,10 +73,10 @@ else
 end
 
 %% Data organization
-for ii = 3:length(ML_folder)
+for ii = 1:length(dir_ML)
     
     % Creates directory for machine learning inputs
-    ML_data_path = fullfile(ML_path,ML_folder(ii).name);
+    ML_data_path = fullfile(ML_path,dir_ML(ii).name);
     ML_data = dir(ML_data_path);
     
     % Variables to reset each folder
@@ -138,107 +139,106 @@ for ii = 3:length(ML_folder)
     
     %% EEG Component Ranking
     % Iterate through each file (includes .set and .fdt files)
-    for i = 3:length(input_data)
+    for i = 1:length(dir_eeg)
         
         % Grabbing current file name
-        file = input_data(i).name;
+        file = dir_eeg(i).name;
         
-        % Iterate through each subject (.set only)
-        if contains(file,'set')
-            EEG = pop_loadset('filename',file,'filepath',input_path,'loadmode','all');
-            comp_num = length(EEG.dipfit.model);
+        % Load dataset
+        EEG = pop_loadset('filename',file,'filepath',input_path,'loadmode','all');
+        comp_num = length(EEG.dipfit.model);
+        
+        % Initializing component coordinates
+        data = zeros(comp_num,4);
+        data(:,1) = linspace(1,comp_num,comp_num);
+        
+        % Reading regions using list
+        ref = tdfread('regionRef.txt',',');
+        label = cellstr(ref.label);
+        
+        % Initializing for component information
+        info = {};
+        comp_psd = [];
+        
+        % PART 1 - Obtain Component Information
+        % Iterate through components obtain info
+        for j = 1:comp_num
             
-            % Initializing component coordinates
-            data = zeros(comp_num,4);
-            data(:,1) = linspace(1,comp_num,comp_num);
-            
-            % Reading regions using list
-            ref = tdfread('regionRef.txt',',');
-            label = cellstr(ref.label);
-            
-            % Initializing for component information
-            info = {};
-            comp_psd = [];
-            
-            % PART 1 - Obtain Component Information
-            % Iterate through components obtain info
-            for j = 1:comp_num
-                
-                % Append current component coordinates
-                data(j,2:4) = EEG.dipfit.model(j).posxyz(1:3);
-                name = EEG.dipfit.model(j).areadk;
-                if sum(contains(label,name)) == 1
-                    hemisphereL = strtrim(ref.hemisphere(contains(label,name),:));
-                    lobeL = strtrim(ref.lobe(contains(label,name),:));
-                    gyrusL = strtrim(ref.gyrus(contains(label,name),:));
-                elseif length(name) == 7 && name(1) == 'n'
-                    hemisphereL = 'none';
-                    lobeL = 'none';
-                    gyrusL = 'none';
-                else
-                    fprintf('''%s'' not found\n',name)
-                end
-                
-                % Compiling information into a structure
-                info = struct('subject',subj(fileCount),...
-                    'posX',EEG.dipfit.model(j).posxyz(1),...
-                    'posY',EEG.dipfit.model(j).posxyz(2),...
-                    'posZ',EEG.dipfit.model(j).posxyz(3),...
-                    'hemisphere',hemisphereL,...
-                    'lobe',lobeL,...
-                    'gyrus',gyrusL,...
-                    'rv',EEG.dipfit.model(j).rv);
-                
-                % Append components together
-                comp_info = [comp_info,info];
-            end
-            
-            % PART 2 - Component Ranking
-            % Iterate through components obtain PSDs
-            for comp = 1:comp_num
-                icaacttmp = (EEG.icaweights(comp,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
-                [spectra,~] = spectopo(icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,comp),'verbose','off','plot','off');
-                comp_psd = [comp_psd, spectra(1:100)'];
-            end
-            
-            % Shorten PSD to desired powerband
-            comp_psd = comp_psd([min(loc):max(loc)],:);
-            comp_psd = 10.^(comp_psd./10);
-            
-            % Component frequencies * ML weight to obtain a score
-            comp_score = comp_psd.*abs(weight(:,1));
-            
-            % Averaging with frequency band
-            comp_score = mean(comp_score,1)';
-            
-            % Organizing with ranks
-            [val,idx] = sortrows(comp_score,1,'descend');
-            componentWeight = [val,idx];
-            for k = 1:comp_num
-                comp_score(componentWeight(k,2),2) = k;
-            end
-            
-            % Appending to comp_info
-            for u = 1:comp_num
-                comp_info(u).(strcat(folder_name,'_power')) = mean(comp_psd(:,u));
-                comp_info(u).(strcat(folder_name,'_score')) = comp_score(u,1);
-                comp_info(u).(strcat(folder_name,'_rank')) = comp_score(u,2);
-            end
-            
-            % Adds to a final component info list
-            if firstPass == 0 && ~exist('comp_final','var')
-                comp_final = comp_info;
-                firstPass = 1;
+            % Append current component coordinates
+            data(j,2:4) = EEG.dipfit.model(j).posxyz(1:3);
+            name = EEG.dipfit.model(j).areadk;
+            if sum(contains(label,name)) == 1
+                hemisphereL = strtrim(ref.hemisphere(contains(label,name),:));
+                lobeL = strtrim(ref.lobe(contains(label,name),:));
+                gyrusL = strtrim(ref.gyrus(contains(label,name),:));
+            elseif length(name) == 7 && name(1) == 'n'
+                hemisphereL = 'none';
+                lobeL = 'none';
+                gyrusL = 'none';
             else
-                comp_final = [comp_final, comp_info];
+                fprintf('''%s'' not found\n',name)
             end
             
-            comp_info = [];
-            fileCount = fileCount + 1;
+            % Compiling information into a structure
+            info = struct('subject',subj(fileCount),...
+                'posX',EEG.dipfit.model(j).posxyz(1),...
+                'posY',EEG.dipfit.model(j).posxyz(2),...
+                'posZ',EEG.dipfit.model(j).posxyz(3),...
+                'hemisphere',hemisphereL,...
+                'lobe',lobeL,...
+                'gyrus',gyrusL,...
+                'rv',EEG.dipfit.model(j).rv);
+            
+            % Append components together
+            comp_info = [comp_info,info];
         end
+        
+        % PART 2 - Component Ranking
+        % Iterate through components obtain PSDs
+        for comp = 1:comp_num
+            icaacttmp = (EEG.icaweights(comp,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
+            [spectra,~] = spectopo(icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,comp),'verbose','off','plot','off');
+            comp_psd = [comp_psd, spectra(1:100)'];
+        end
+        
+        % Shorten PSD to desired powerband
+        comp_psd = comp_psd([min(loc):max(loc)],:);
+        comp_psd = 10.^(comp_psd./10);
+        
+        % Component frequencies * ML weight to obtain a score
+        comp_score = comp_psd.*abs(weight(:,1));
+        
+        % Averaging with frequency band
+        comp_score = mean(comp_score,1)';
+        
+        % Organizing with ranks
+        [val,idx] = sortrows(comp_score,1,'descend');
+        componentWeight = [val,idx];
+        for k = 1:comp_num
+            comp_score(componentWeight(k,2),2) = k;
+        end
+        
+        % Appending to comp_info
+        for u = 1:comp_num
+            comp_info(u).([folder_name,'_power']) = mean(comp_psd(:,u));
+            comp_info(u).([folder_name,'_score']) = comp_score(u,1);
+            comp_info(u).([folder_name,'_rank']) = comp_score(u,2);
+        end
+        
+        % Adds to a final component info list
+        if firstPass == 0 && ~exist('comp_final','var')
+            comp_final = comp_info;
+            firstPass = 1;
+        else
+            comp_final = [comp_final, comp_info];
+        end
+        
+        comp_info = [];
+        fileCount = fileCount + 1;
+        
     end
     
-    filename = strcat(output_path,folder_name,'_components.xlsx');
+    filename = fullfile(output_path,[folder_name,'_components.xlsx']);
     writetable(struct2table(comp_final),filename);
     
 end

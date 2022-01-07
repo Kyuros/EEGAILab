@@ -29,7 +29,7 @@ function [] = comp2vis(input_path,output_path,labels,subj)
 %% Checking inputs and loading data
 high_responders = subj(labels == 1); % Separating subjects into groups
 moderate_responders = subj(labels == -1); % Separating subjects into groups
-input_data = dir(input_path); % Directory for excel inputs
+dir_xlsx = dir(fullfile(input_path,'*.xlsx')); % Directory for excel inputs
 load('standard_mri.mat') % Load standard MRI for background
 N = 10; % Top ranking components
 
@@ -45,10 +45,10 @@ end
 
 %% Code
 % Loop through each powerband sheet
-for ii = 3:length(input_data)
+for ii = 1:length(dir_xlsx)
     
     % Grab name of file ("BAND_components.xlsx")
-    filename = input_data(ii).name;
+    filename = dir_xlsx(ii).name;
     name = extractBefore(filename,'_');
     
     % Entire contents of the component sheet here
@@ -72,12 +72,12 @@ for ii = 3:length(input_data)
     figure(45); imshow(yz); axis off; % Moderate responder - Sagittal view
     
     % Finds indexes of all top dipoles
-    dp_hr = find(data_high.(strcat(name,'_rank')) <= N); % Finds all top 10 dipoles
-    dp_mr = find(data_mod.(strcat(name,'_rank')) <= N); % CHANGE DIPOLE COLUMN
+    dp_hr = find(data_high.([name,'_rank']) <= N); % Finds all top 10 dipoles
+    dp_mr = find(data_mod.([name,'_rank']) <= N); % CHANGE DIPOLE COLUMN
 
     % Dipole Rank Column
-    ranking_r = data_high.(strcat(name,'_rank')); % CHANGE DIPOLE COLUMN HERE
-    ranking_nr = data_mod.(strcat(name,'_rank')); % CHANGE DIPOLE COLUMN HERE
+    ranking_r = data_high.([name,'_rank']); % CHANGE DIPOLE COLUMN HERE
+    ranking_nr = data_mod.([name,'_rank']); % CHANGE DIPOLE COLUMN HERE
     
     % High Responders
     for i = 1:length(dp_hr)
@@ -299,16 +299,16 @@ for ii = 3:length(input_data)
     end
     
     % Saving as .svg
-    name11 = strcat(name,'_HIGH_axial.svg');
-    name12 = strcat(name,'_HIGH_coronal.svg');
-    name13 = strcat(name,'_HIGH_sagittal.svg');
+    name11 = [name,'_HIGH_axial.svg'];
+    name12 = [name,'_HIGH_coronal.svg'];
+    name13 = [name,'_HIGH_sagittal.svg'];
     saveas(figure(11),fullfile(output_path_comp,name11))
     saveas(figure(12),fullfile(output_path_comp,name12))
     saveas(figure(13),fullfile(output_path_comp,name13))
     
-    name43 = strcat(name,'_MOD_axial.svg');
-    name44 = strcat(name,'_MOD_coronal.svg');
-    name45 = strcat(name,'_MOD_sagittal.svg');
+    name43 = [name,'_MOD_axial.svg'];
+    name44 = [name,'_MOD_coronal.svg'];
+    name45 = [name,'_MOD_sagittal.svg'];
     saveas(figure(43),fullfile(output_path_comp,name43))
     saveas(figure(44),fullfile(output_path_comp,name44))
     saveas(figure(45),fullfile(output_path_comp,name45))

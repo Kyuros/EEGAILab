@@ -35,9 +35,10 @@ function [] = mat2excel(input_path,output_path,subj,filename,overwrite)
 %% Checking inputs and initializing variables
 % Retrieving inputs
 folder_data = dir(input_path);
+dir_data = dir(fullfile(input_path,'*.mat'));
 
 % Check that subj variable and actual files are correct shape
-N = length(folder_data)-2; % Number of subjects based on directory
+N = length(dir_data); % Number of subjects based on directory
 if ~exist('subj','var')
     subj = (1:N)'; % Generates a column vector of unique IDs if not present
 elseif length(subj) ~= N
@@ -72,10 +73,10 @@ path_output = fullfile(output_path,filename);
 if isfile(path_output) == 1 && overwrite == 'Y' || isfile(path_output) == 0
     
     % Iterate through input folder path
-    for i = 3:length(folder_data)
+    for i = 1:length(dir_data)
         
         % Loads .mat file
-        file_path = fullfile(input_path,folder_data(i).name);
+        file_path = fullfile(input_path,dir_data(i).name);
         data = load(file_path);
         
         % Appends data to matrix

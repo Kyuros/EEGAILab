@@ -22,8 +22,10 @@ function [] = eeglab2mat(input_path,output_path,overwrite)
 %                     file pairs. Uses the name of .set and .fdt pair.
 %
 %---------------------------------------------
-% Last Updated: 7/1/21
+% Last Updated: 1/6/22
 % - 7/1 Created
+% - 1/6 Changed how directory is read. Only reads necessary files instead
+%       of parsing through each and every file.
 
 %% Checking inputs and intializing variables
 % Checks if need to overwrite
@@ -34,7 +36,7 @@ elseif overwrite ~= 'Y' && overwrite ~= 'N'
 end
 
 % Retrieving inputs
-folder_data = dir(input_path);
+dir_eeg = dir(fullfile(input_path,'*.set'));
 
 % Tracking how many changes
 fileCount = 0; % Tracks number of total processed files
@@ -43,15 +45,15 @@ owCount = 0; % Tracks overwritten files
 
 %% Converting .set/.fdt to .mat
 % Iterate through input folder path
-for i = 3:length(folder_data)
+for i = 1:length(dir_eeg)
     
     % Set up file names
-    file = folder_data(i).name; % Grabs .set file name of current iteration
+    file = dir_eeg(i).name; % Grabs .set file name of current iteration
     output_name = strcat(extractBefore(file,'.'),'.mat'); % Create .mat file name
     path_output = fullfile(output_path,output_name); % Expected path for saving file
     
-    % Perform task by calling .set data AND only if output file does not already exist
-    if contains(file,'set') && isfile(path_output) == 0 || contains(file,'set') && isfile(path_output) == 1 && overwrite == 'Y'
+    % Perform task if output file does not already exist
+    if isfile(path_output) == 0 || isfile(path_output) == 1 && overwrite == 'Y'
         
         % Loading subject with EEGLAB
         EEG = pop_loadset('filename',file,'filepath',input_path,'loadmode','all');
@@ -70,7 +72,7 @@ for i = 3:length(folder_data)
             save(path_output,"eegData")
             newCount = newCount + 1;
         end
-    elseif contains(file,'set') && isfile(path_output) == 0 || contains(file,'set') && isfile(path_output) == 1 && overwrite == 'N'
+    elseif isfile(path_output) == 0 || isfile(path_output) == 1 && overwrite == 'N'
         fileCount = fileCount + 1;
     end
 end

@@ -34,7 +34,7 @@ function [] = comp2pwr(input_path,output_path,labels,subj,N)
 %% Initializing variables and checking inputs
 high_responders = subj(labels == 1); % Separating subjects into groups
 moderate_responders = subj(labels == -1); % Separating subjects into groups
-input_data = dir(input_path); % Grab directory for .xlsx component sheets (Stage 4)
+dir_xlsx = dir(fullfile(input_path,'*.xlsx')); % Grab directory for .xlsx component sheets (Stage 4)
 power_info = []; % Initialize power information
 
 % Check subject numbering and if correct size
@@ -56,10 +56,10 @@ end
 
 %% Code
 % Loop through each powerband sheet
-for ii = 3:length(input_data)
+for ii = 1:length(dir_xlsx)
     
     % Grab name of file ("BAND_components.xlsx")
-    filename = input_data(ii).name;
+    filename = dir_xlsx(ii).name;
     name = extractBefore(filename,'_');
     
     % Entire contents of the component sheet here

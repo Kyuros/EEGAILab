@@ -224,34 +224,37 @@ for i = 1:6
 end
 %% Find component weights from CV
 band_path = dir(output_path);
+band_path = band_path(~ismember({band_path.name},{'.','..'})); % Remove . and .. from directory
 
 % Iterate through each Powerband Folder
-for ii = 3:length(band_path)
+for ii = 1:length(band_path)
     
     % Create directory for iterations
-    Outer_name = strcat(output_path,band_path(ii).name); % Name for powerband folder
+    Outer_name = fullfile(output_path,band_path(ii).name); % Name for powerband folder
     Outer_storage = dir(Outer_name); % Directory for powerband folder
+    Outer_storage = Outer_storage(~ismember({Outer_storage.name},{'.','..'})); % Remove . and .. from directory
     
     % Reset weight vector before new band
     weight = [];
     
     % Iterate through each iteration
-    for jj = 6:length(Outer_storage) % Assumes acc,cross_val,and final are in the folder
+    for jj = 4:length(Outer_storage) % Assumes acc,cross_val,and final are in the folder
         
         % Create directory for cv folds
-        Inner_name = strcat(Outer_name,'\',Outer_storage(jj).name);
+        Inner_name = fullfile(Outer_name,Outer_storage(jj).name);
         Inner_storage = dir(Inner_name);
+        Inner_storage = Inner_storage(~ismember({Inner_storage.name},{'.','..'})); % Remove . and .. from directory
         
         % Iterate through each cv fold
-        for kk = 3:length(Inner_storage)
+        for kk = 1:length(Inner_storage)
             
             % Load model for a single fold
-            Model_name = strcat(Inner_name,'\',Inner_storage(kk).name,'\model.mat');
+            Model_name = fullfile(Inner_name,Inner_storage(kk).name,'model.mat');
             load(Model_name)
             
             % Create or append existing weight
             if strcmp(band_path(ii).name,'All')
-                if jj == 6 && kk == 3
+                if jj == 4 && kk == 1
                     % Initialize weight
                     weight = perf.weights;
                 else
@@ -259,31 +262,31 @@ for ii = 3:length(band_path)
                     weight = (weight+perf.weights)/2;
                 end
             elseif strcmp(band_path(ii).name,'Alpha')
-                if jj == 6 && kk == 3
+                if jj == 4 && kk == 1
                     weight = perf.weights;
                 else
                     weight = (weight+perf.weights)/2;
                 end
             elseif strcmp(band_path(ii).name,'Beta')
-                if jj == 6 && kk == 3
+                if jj == 4 && kk == 1
                     weight = perf.weights;
                 else
                     weight = (weight+perf.weights)/2;
                 end
             elseif strcmp(band_path(ii).name,'Delta')
-                if jj == 6 && kk == 3
+                if jj == 4 && kk == 1
                     weight = perf.weights;
                 else
                     weight = (weight+perf.weights)/2;
                 end
             elseif strcmp(band_path(ii).name,'Gamma')
-                if jj == 6 && kk == 3
+                if jj == 4 && kk == 1
                     weight = perf.weights;
                 else
                     weight = (weight+perf.weights)/2;
                 end
             elseif strcmp(band_path(ii).name,'Theta')
-                if jj == 6 && kk == 3
+                if jj == 4 && kk == 1
                     weight = perf.weights;
                 else
                     weight = (weight+perf.weights)/2;

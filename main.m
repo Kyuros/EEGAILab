@@ -14,7 +14,7 @@ clc;clear;
 % INSTRUCTIONS
 % - Place data in the data folder and run this script.
 % - Adjust variables if needed
-
+tic
 %% Adjustable Variables
 % SUBJECT IDS
 % - Unique ID for each subject
@@ -49,39 +49,45 @@ if(~isdeployed)
   cd(fileparts(which('main.m')));
 end
 
+% Directory for processed data
+path_inter = 'processed_data';
+mkdir(path_inter);
+
 for i = 1:5
-    folder = strcat('processed_data\stage',num2str(i));
+    folder = fullfile(path_inter, ['stage',num2str(i)]);
     if ~exist(folder,'dir')
         mkdir(folder)
     end
 end
 
 % Set paths
-eeg_path = 'data\'; % EEGLAB data (.set and .fdt)
-mat_path = 'processed_data\stage1\'; % MATLAB data (.mat)
-freq_path = 'processed_data\stage2\'; % PSD Frequencies (.xlsx)
-ML_path = 'processed_data\stage3\'; % Machine learning models
-comp_path = 'processed_data\stage4\'; % Component sheets (.xlsx)
-vis_path = 'processed_data\stage5\'; % Component visualization (.svg and .xlsx)
+path_eeg = 'data'; % EEGLAB data (.set and .fdt)
+path_mat = fullfile(path_inter,'stage1'); % MATLAB data (.mat)
+path_freq = fullfile(path_inter,'stage2'); % PSD Frequencies (.xlsx)
+path_ML = fullfile(path_inter,'stage3'); % Machine learning models
+path_comp = fullfile(path_inter,'stage4'); % Component sheets (.xlsx)
+path_vis = fullfile(path_inter,'stage5'); % Component visualization (.svg and .xlsx)
 
 % ---------------------------------------------------------------------
 % Calling functions
-addpath(genpath('src'))
+addpath('src/functions')
+addpath('src/references')
 
 % 1. Convert EEGLAB data to power spectrum density as .mat file
-eeglab2mat(eeg_path,mat_path,overwrite);
+eeglab2mat(path_eeg,path_mat,overwrite);
 
 % 2. Saving .mat file as machine learning readable excel file
-mat2excel(mat_path,freq_path,subj,'freq_features.xlsx',overwrite);
+mat2excel(path_mat,path_freq,subj,'freq_features.xlsx',overwrite);
 
 % 3. Perform SVM machine learning
-svm_eeg(freq_path,ML_path,labels,N,n_fold,feature_sel,pval,overwrite);
+svm_eeg(path_freq,path_ML,labels,N,n_fold,feature_sel,pval,overwrite);
 
 % 4. Get component information and save as an excel file
-eeglab2comp(eeg_path,ML_path,comp_path,subj,weight);
+eeglab2comp(path_eeg,path_ML,path_comp,subj,weight);
 
 % 5a. Visualize and obtain power of components
-comp2pwr(comp_path,vis_path,labels,subj,top)
+comp2pwr(path_comp,path_vis,labels,subj,top)
 
 % 5b. Visualize components across axial, coronal, and sagittal views
-comp2vis(comp_path,vis_path,labels,subj)
+comp2vis(path_comp,path_vis,labels,subj)
+toc
