@@ -69,6 +69,7 @@ libsvm-3.24/matlab/
 2. Mex files `'libsvmread.mex'`, `'libsvmwrite.mex'`, `'svmtrain.mex'`, and `'svmpredict.mex'` should be built after a successful installation.
 
 ### EEGLAB (+Plugins) Installation
+> Lab members can skip to **step 3** as the toolboxes are included in the Dropbox.
 1. Navigate to the EEGLAB toolbox from the GitHub (eeglab2021.1) [link](https://github.com/sccn/eeglab/tree/eeglab2021.1).
 2. **Download the ZIP** from the **Code** dropdown menu. (No plugins are included with this approach)
 3. Open MATLAB and navigate to the EEGLAB folder as the current directory.
