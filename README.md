@@ -118,7 +118,7 @@ Below is an example output when comparing spinal cord stimulation responders usi
 ## Contact
 For any questions, email **kylebsee@ufl.edu**
 
-### For use in publications, please cite as:
+### If you use this code or part of this code for your own work, please cite the following publications:
 
 Kyle B. See, Rachel Ho, Stephen Coombes, Ruogu Fang, “TL1 Team Approach to Predicting Response to Spinal Cord Stimulation for Chronic Low Back Pain”, Journal of Clinical and Translational Science, Mar 2021.
 
