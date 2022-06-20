@@ -55,23 +55,27 @@ end
 % Train/Test indices
 train_ind = cv1.training(fold);
 test_ind = cv1.test(fold);
+x_train = x(cv1.training(fold),:);
+x_test = x(cv1.test(fold),:);
 
 % Normalize data using training mean and standard deviation
-scale_mean = mean(x(train_ind,:),1);
-scale_std = std(x(train_ind,:),0,1);
-x(train_ind,:) = (x(train_ind,:) - scale_mean) ./ scale_std;
-x(test_ind,:) = (x(test_ind,:) - scale_mean) ./ scale_std;
+scale_mean = mean(x_train,1);
+scale_std = std(x_train,0,1);
+x_train = (x_train - scale_mean) ./ scale_std;
+x_test = (x_test - scale_mean) ./ scale_std;
 
 % x(train_ind,:) = normalize(x(train_ind,:),1,'range',[-1 1]);
 % x(test_ind,:) = normalize(x(test_ind,:),1,'range',[-1 1]);
 
 % Feature selection with t-test
 if feature_sel == 1
-    [~,p] = ttest2(x(labels(train_ind) == 1,:), x(labels(train_ind) == 0,:));
+    x_train_pos = x_train(labels(train_ind) == 1,:); % Positive class of training
+    x_train_neg = x_train(labels(train_ind) == -1,:); % Negative class of training
+    [~,p] = ttest2(x_train_pos, x_train_neg);
     features = (p < pval);
-    x_sel = x(:,features==1);
+    x_sel = x_train(:,features==1);
 else
-    x_sel = x;
+    x_sel = x_train;
 end
 
 % C parameter in SVM
@@ -81,13 +85,13 @@ C_val = zeros(2,length(C))';
 % Iterate through each C
 for ii = 1:length(C)
     % Train model
-    model = svmtrain(labels,x_sel,['-t 0 -h 0 -q -c ' num2str(C(ii))]);
+    model = svmtrain(labels(train_ind),x_sel,['-t 0 -h 0 -q -c ' num2str(C(ii))]);
     
     % Training performance
-    [ypred_train, tempacc, train_score] = svmpredict(labels(train_ind), x_sel(train_ind,:),model,['-q']);
+    [ypred_train, tempacc, train_score] = svmpredict(labels(train_ind), x_sel, model, ['-q']);
     
     % Test performance
-    [ypred_test,~,test_score] = svmpredict(labels(test_ind), x_sel(test_ind,:),model,['-q']);
+    [ypred_test,~,test_score] = svmpredict(labels(test_ind), x_test, model, ['-q']);
     
     % Save performance for best C
     C_val(ii,1) = C(ii);
@@ -99,9 +103,9 @@ end
 C_optimal = C(c_idx);
 
 % Train model with optimal C
-model = svmtrain(labels,x_sel,['-t 0 -h 0 -q -c ' num2str(C_optimal)]);
-[ypred_train,~,train_score] = svmpredict(labels(train_ind), x_sel(train_ind,:),model,['-q']);
-[ypred_test,accuracy,test_score] = svmpredict(labels(test_ind), x_sel(test_ind,:),model,['-q']);
+model = svmtrain(labels(train_ind),x_sel,['-t 0 -h 0 -q -c ' num2str(C_optimal)]);
+[ypred_train,~,train_score] = svmpredict(labels(train_ind), x_sel, model,['-q']);
+[ypred_test,accuracy,test_score] = svmpredict(labels(test_ind), x_test, model,['-q']);
 
 %% Saving output
 perf.x_sel = x_sel;

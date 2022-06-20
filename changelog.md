@@ -1,3 +1,7 @@
+## [0.0.2] - 2022-06-20
+### Changed
+- `train_svm.m` now uses separate training and testing variables, x_train and x_test, instead of referencing with training and testing indices, train_ind and test_ind.
+
 ## [0.0.1] - 2022-01-06
 ### Added
 - `changelog.md`
